@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from './../../shared/auth.service';
 import { Router } from '@angular/router';
 
@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 
 export class SignupComponent implements OnInit {
   signupForm: FormGroup;
+  submitted = false;
 
   constructor(
     public fb: FormBuilder,
@@ -18,16 +19,26 @@ export class SignupComponent implements OnInit {
     public router: Router
   ) {
     this.signupForm = this.fb.group({
-      name: [''],
-      email: [''],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       mobile: [''],
-      password: ['']
+      password: ['', [Validators.required, Validators.minLength(6)]]
     })
   }
+
+  // convenience getter for easy access to form fields
+  get f() { return this.signupForm.controls; }
 
   ngOnInit() { }
 
   registerUser() {
+    this.submitted = true;
+
+    // stop here if form is invalid
+    if (this.signupForm.invalid) {
+        return;
+    }
+
     this.authService.signUp(this.signupForm.value).subscribe((res) => {
       if (res.result) {
         this.signupForm.reset()

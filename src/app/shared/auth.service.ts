@@ -13,6 +13,7 @@ export class AuthService {
   endpoint: string = 'http://localhost:4000/api';
   headers = new HttpHeaders().set('Content-Type', 'application/json');
   currentUser = {};
+  public errorMessage: string = '';
 
   constructor(
     private http: HttpClient,
@@ -78,6 +79,14 @@ export class AuthService {
       // server-side error
       msg = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
+    if(error.status === 422){
+      msg =  error.error;
+    }
+
+    console.log(msg);
     return throwError(msg);
   }
+
+  
+
 }
