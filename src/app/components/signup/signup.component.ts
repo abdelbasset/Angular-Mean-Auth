@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from './../../shared/auth.service';
 import { Router } from '@angular/router';
+import { MustMatch } from '../_helpers/must-match.validator';
 
 @Component({
   selector: 'app-signup',
@@ -22,8 +23,11 @@ export class SignupComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       mobile: [''],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    })
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
+    },{
+      validator: MustMatch('password', 'confirmPassword')
+  })
   }
 
   // convenience getter for easy access to form fields
