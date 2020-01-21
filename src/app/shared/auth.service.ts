@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { UIService } from './ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +18,20 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    public router: Router
+    public router: Router,
+    private uiService: UIService
   ) {
   }
 
   // Sign-up
   signUp(user: User): Observable<any> {
     let api = `${this.endpoint}/register-user`;
-    return this.http.post(api, user)
-      .pipe(
-        catchError(this.handleError)
-      )
+    let res = this.http.post(api, user)
+    .pipe(
+      catchError(this.handleError)
+    )
+    
+    return res;
   }
 
   // Sign-in
@@ -36,9 +40,14 @@ export class AuthService {
       .subscribe((res: any) => {
         localStorage.setItem('access_token', res.token)
         this.getUserProfile(res._id).subscribe((res) => {
+          this.uiService.loadingStateChanged.next(true);
           this.currentUser = res;
           this.router.navigate(['user-profile/' + res.msg._id]);
         })
+      }, (error) => {
+        this.uiService.loadingStateChanged.next(false);
+        this.uiService.showSnackbar(error.error.message, null, 3000);
+        this.errorMessage = error.error.message;
       })
   }
 
@@ -77,13 +86,10 @@ export class AuthService {
       msg = error.error.message;
     } else {
       // server-side error
-      msg = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      //msg = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      msg = error.error.error.message;
     }
-    if(error.status === 422){
-      msg =  error.error;
-    }
-
-    console.log(msg);
+    //console.log(msg);
     return throwError(msg);
   }
 

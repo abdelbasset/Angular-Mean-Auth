@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from './../../shared/auth.service';
 import { Router } from '@angular/router';
 import { MustMatch } from '../_helpers/must-match.validator';
+import { UIService } from '../../shared/ui.service';
 
 @Component({
   selector: 'app-signup',
@@ -17,8 +18,9 @@ export class SignupComponent implements OnInit {
   constructor(
     public fb: FormBuilder,
     public authService: AuthService,
-    public router: Router
-  ) {
+    public router: Router,
+    private uiService: UIService
+    ) {
     this.signupForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -27,7 +29,7 @@ export class SignupComponent implements OnInit {
       confirmPassword: ['', Validators.required],
     },{
       validator: MustMatch('password', 'confirmPassword')
-  })
+    })
   }
 
   // convenience getter for easy access to form fields
@@ -44,10 +46,15 @@ export class SignupComponent implements OnInit {
     }
 
     this.authService.signUp(this.signupForm.value).subscribe((res) => {
+      
       if (res.result) {
         this.signupForm.reset()
         this.router.navigate(['log-in']);
+      }else{
+        //console.log(res);
+        this.uiService.showSnackbar(res , null, 3000);
       }
     })
+    
   }
 }
