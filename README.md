@@ -17,7 +17,7 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 ## Start the Node Server
 * Run `cd server-node-token-auth`
 * Run `npm install` to install required packages
-* Open terminal run `nodemon`
+* Open terminal run `npm run start`
 * Open other terminal run `mongod`
 
 ## Authentication REST APIs
